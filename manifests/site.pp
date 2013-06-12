@@ -16,7 +16,6 @@ node default {
 #  }
 
 class { 'mediawiki':
-  server_name        => 'www.myawesomesite.com',
   admin_email         => 'admin@example.com',
   db_root_password => 'password',
   doc_root         => '/var/www',
