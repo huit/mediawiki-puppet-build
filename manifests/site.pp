@@ -16,7 +16,8 @@ node default {
 #  }
 
 class { 'mediawiki':
-  admin_email         => 'admin@example.com',
+  server_name      => $::ec2_public_hostname,
+  admin_email      => 'admin@example.com',
   db_root_password => 'password',
   doc_root         => '/var/www',
   max_memory       => '1024'
