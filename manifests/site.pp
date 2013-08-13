@@ -19,7 +19,7 @@ class { 'mediawiki':
   server_name      => $::ec2_public_hostname,
   admin_email      => 'admin@example.com',
   db_root_password => 'password',
-  doc_root         => '/var/www',
+  doc_root         => '/var/www/wiki',
   max_memory       => '1024'
 }
   
