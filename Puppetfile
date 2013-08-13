@@ -10,6 +10,6 @@ mod "concat",
   :git => "git://github.com/ripienaar/puppet-concat.git"
   
 mod "mediawiki",
-  :git => "https://github.com/martasd/puppet-mediawiki.git"
+  :git => "https://github.com/bodepd/puppet-mediawiki.git"
 
   
