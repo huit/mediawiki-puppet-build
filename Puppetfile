@@ -6,10 +6,6 @@ mod "puppetlabs/firewall"
 mod "puppetlabs/mysql"
 mod "saz/memcached"
 
-mod "concat",
-  :git => "git://github.com/ripienaar/puppet-concat.git"
-  
 mod "mediawiki",
-  :git => "https://github.com/bodepd/puppet-mediawiki.git"
-
-  
+  :git => "git://github.com/huit/puppet-mediawiki.git",
+  :ref => 'feature/master/rds_support'
