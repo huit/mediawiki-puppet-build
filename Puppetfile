@@ -1,6 +1,7 @@
 forge 'forge.puppetlabs.com'
 
 mod "puppetlabs/stdlib"
+mod "puppetlabs/concat"
 mod "puppetlabs/firewall"
 mod "puppetlabs/mysql"
 mod "saz/memcached"
