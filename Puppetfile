@@ -8,4 +8,4 @@ mod "saz/memcached"
 
 mod "mediawiki",
   :git => "git://github.com/huit/puppet-mediawiki.git",
-  :ref => 'feature/master/rds_support'
+  :ref => 'feature/rds_support'
