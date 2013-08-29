@@ -7,7 +7,6 @@ logfile='/tmp/bootstrap.log'
 # configure hiera
 if [[ -f './manifests/bootstrap.pp' ]]; then
     puppet apply ./manifests/bootstrap.pp
-    echo "Exit value: $?"
 else
     echo "Hiera deployment manifest not available."
 fi
