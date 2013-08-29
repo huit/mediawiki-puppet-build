@@ -2,6 +2,12 @@ node default {
 
   include stdlib
 
+  # try APC for PHP opcode caching
+  package { 'php-pecl-apc':
+    ensure => 'present',
+    before => Class['mediawiki'],
+  }
+
   # needs to be modified to talk to RDS
   class { 'mediawiki':
     server_name      => $::ec2_public_hostname,
