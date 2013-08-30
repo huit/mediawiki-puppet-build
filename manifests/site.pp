@@ -2,8 +2,14 @@ node default {
 
   include stdlib
 
-  # try APC for PHP opcode caching
+  # use APC for PHP opcode caching
   package { 'php-pecl-apc':
+    ensure => 'present',
+    before => Class['mediawiki'],
+  }
+
+  # PHP XML support for content import
+  package { 'php-xml':
     ensure => 'present',
     before => Class['mediawiki'],
   }
