@@ -12,7 +12,7 @@ node default {
   # parameters passed from nepho
   $nepho_instance_role = hiera('NEPHO_INSTANCE_ROLE')
   $nepho_external_hostname = hiera('NEPHO_EXTERNAL_HOSTNAME',$::ec2_public_hostname)
-  $nepho_backend_hostname = hiera('NEPHO_BACKEND_HOSTNAME')
+  $nepho_backend_hostname = hiera('NEPHO_BACKEND_HOSTNAME','localhost')
   $nepho_database_host = hiera('NEPHO_DATABASE_HOST',$default_database_host)
   $nepho_database_port = hiera('NEPHO_DATABASE_PORT',$default_database_port)
   $nepho_database_name = hiera('NEPHO_DATABASE_NAME',$default_database_name)
