@@ -54,9 +54,9 @@ node default {
 
       mediawiki::instance { 'wiki':
         ensure      => 'present',
-        db_password => 'mediawiki',
+        db_password => $nepho_database_password,
         db_name     => $nepho_database_name,
-        db_user     => 'mediawiki',
+        db_user     => $nepho_database_user,
         port        => '8080',
       }
 
@@ -74,6 +74,12 @@ node default {
 
       # PHP XML support for content import
       package { 'php-xml':
+        ensure => 'present',
+        before => Class['mediawiki'],
+      }
+
+      # PHP Unicode normalization
+      package { 'php-intl':
         ensure => 'present',
         before => Class['mediawiki'],
       }
@@ -100,7 +106,4 @@ node default {
 
     }
   }
-
-
-
 }
