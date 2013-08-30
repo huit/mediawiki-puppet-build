@@ -8,6 +8,7 @@ node default {
   $default_database_name = 'mediawiki'
   $default_database_user = 'mediawiki'
   $default_database_password = 'mediawiki'
+  $default_application_port = '8080'
 
   # parameters passed from nepho
   $nepho_instance_role = hiera('NEPHO_INSTANCE_ROLE')
@@ -24,8 +25,10 @@ node default {
     'varnish': {
       # tier 1
 
-      # FIXME needs a custom VCL
-      class { 'varnish': }
+      # use a custom VCL
+      class { 'varnish':
+        vcl_content => inline_template(file('templates/tiered.vcl.erb'))
+      }
     }
     'mediawiki': {
       # tier 2
@@ -63,7 +66,7 @@ node default {
         db_password => $nepho_database_password,
         db_name     => $nepho_database_name,
         db_user     => $nepho_database_user,
-        port        => '8080',
+        port        => $default_application_port,
       }
 
       # install LocalS3Repos plugin
@@ -105,7 +108,7 @@ node default {
         db_password   => $nepho_database_password,
         db_name       => $nepho_database_name,
         db_user       => $nepho_database_user,
-        port          => '8080',
+        port          => $default_application_port,
       }
 
       # install LocalS3Repos plugin
