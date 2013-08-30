@@ -78,7 +78,6 @@ node default {
         before => Class['mediawiki'],
       }
 
-      # needs to be modified to talk to RDS
       class { 'mediawiki':
         server_name      => $nepho_external_hostname,
         admin_email      => 'admin@example.com',
@@ -86,11 +85,11 @@ node default {
         db_root_password => $nepho_database_password,
         doc_root         => '/var/www/html',
         max_memory       => '1024',
+        default_vhost    => false,
       }
 
       mediawiki::instance { 'wiki':
         ensure        => 'present',
-        default_vhost => false,
         db_password   => 'mediawiki',
         db_name       => $nepho_database_name,
         db_user       => 'mediawiki',
