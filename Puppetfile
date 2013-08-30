@@ -7,10 +7,11 @@ mod "puppetlabs/mysql"
 mod "saz/memcached"
 mod "hunner/hiera"
 mod "branan/s3file"
+mod "evenup/varnish"
 
 mod "apache",
   :git => "https://github.com/puppetlabs/puppetlabs-apache.git"
 
 mod "mediawiki",
   :git => "git://github.com/huit/puppet-mediawiki.git",
-  :ref => 'rds_support'
+  :ref => 'mediawiki-poc'
