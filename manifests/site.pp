@@ -45,17 +45,18 @@ node default {
       class { 'mediawiki':
         server_name      => $nepho_external_hostname,
         admin_email      => 'admin@example.com',
-        db_root_user     => 'root',
-        db_root_password => 'password',
+        db_server        => $nepho_database_host,
+        db_root_user     => $nepho_database_user,
+        db_root_password => $nepho_database_password,
         doc_root         => '/var/www/html',
         max_memory       => '1024',
       }
 
       mediawiki::instance { 'wiki':
         ensure      => 'present',
-        db_password => $nepho_database_password,
+        db_password => 'mediawiki',
         db_name     => $nepho_database_name,
-        db_user     => $nepho_database_user,
+        db_user     => 'mediawiki',
         port        => '8080',
       }
 
@@ -63,9 +64,7 @@ node default {
     }
     default: {
       # standalone
-      class { 'varnish':
-        before => Class['mediawiki'],
-      }
+      class { 'varnish': }
 
       # use APC for PHP opcode caching
       package { 'php-pecl-apc':
@@ -83,21 +82,23 @@ node default {
       class { 'mediawiki':
         server_name      => $nepho_external_hostname,
         admin_email      => 'admin@example.com',
-        db_root_user     => 'root',
-        db_root_password => 'password',
+        db_root_user     => $nepho_database_user,
+        db_root_password => $nepho_database_password,
         doc_root         => '/var/www/html',
         max_memory       => '1024',
       }
 
       mediawiki::instance { 'wiki':
-        ensure      => 'present',
-        db_password => $nepho_database_password,
-        db_name     => $nepho_database_name,
-        db_user     => $nepho_database_user,
-        port        => '8080',
+        ensure        => 'present',
+        default_vhost => false,
+        db_password   => 'mediawiki',
+        db_name       => $nepho_database_name,
+        db_user       => 'mediawiki',
+        port          => '8080',
       }
 
       # install LocalS3Repos plugin
+
     }
   }
 
