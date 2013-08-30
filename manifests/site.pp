@@ -41,6 +41,12 @@ node default {
         before => Class['mediawiki'],
       }
 
+      # PHP Unicode normalization
+      package { 'php-intl':
+        ensure => 'present',
+        before => Class['mediawiki'],
+      }
+
       # needs to be modified to talk to RDS
       class { 'mediawiki':
         server_name      => $nepho_external_hostname,
@@ -87,7 +93,7 @@ node default {
       class { 'mediawiki':
         server_name      => $nepho_external_hostname,
         admin_email      => 'admin@example.com',
-        db_root_user     => $nepho_database_user,
+        db_root_user     => 'root',
         db_root_password => $nepho_database_password,
         doc_root         => '/var/www/html',
         max_memory       => '1024',
@@ -96,9 +102,9 @@ node default {
 
       mediawiki::instance { 'wiki':
         ensure        => 'present',
-        db_password   => 'mediawiki',
+        db_password   => $nepho_database_password,
         db_name       => $nepho_database_name,
-        db_user       => 'mediawiki',
+        db_user       => $nepho_database_user,
         port          => '8080',
       }
 
