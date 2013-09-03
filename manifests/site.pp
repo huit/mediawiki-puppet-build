@@ -30,17 +30,52 @@ node default {
     }
     'mediawiki': {
       # tier 2
-      class { 'nepho_mediawiki': }
+      # FIXME needs additional nepho params for db root user and root password
+      class { 'nepho_mediawiki':
+        server_name      => $nepho_external_hostname,
+        db_server        => $nepho_database_host,
+        db_root_user     => $nepho_database_user,
+        db_root_password => $nepho_database_password,
+        db_name          => $nepho_database_name,
+        db_user          => $nepho_database_user,
+        db_password      => $nepho_database_password,
+        db_port          => $nepho_database_port,
+        app_port         => $default_application_port,
+      }
     }
     default: {
       # standalone
       class { 'varnish': }
-      class { 'nepho_mediawiki': }
+      class { 'nepho_mediawiki':
+        server_name      => $nepho_external_hostname,
+        db_server        => $nepho_database_host,
+        db_root_user     => 'root',
+        db_root_password => $nepho_database_password,
+        db_name          => $nepho_database_name,
+        db_user          => $nepho_database_user,
+        db_password      => $nepho_database_password,
+        db_port          => $nepho_database_port,
+        app_port         => $default_application_port,
+      }
     }
   }
 }
 
-class nepho_mediawiki {
+class nepho_mediawiki (
+  $server_name,
+  $db_server,
+  $db_root_user,
+  $db_root_password,
+  $db_name,
+  $db_user,
+  $db_password,
+  $db_port,
+  $app_port,
+  $admin_email = 'admin@example.com',
+  $doc_root = '/var/www/html',
+  $max_memory = '1024',
+  $ensure = 'present'
+) {
   $mw_pkgs = [
     'php-pecl-apc', # Use APC for PHP opcode caching
     'php-xml',      # PHP XML support for content import
@@ -54,21 +89,21 @@ class nepho_mediawiki {
 
   # needs to be modified to talk to RDS
   class { 'mediawiki':
-    server_name      => $::nepho_external_hostname,
-    admin_email      => 'admin@example.com',
-    db_server        => $::nepho_database_host,
-    db_root_user     => $::nepho_database_user,
-    db_root_password => $::nepho_database_password,
-    doc_root         => '/var/www/html',
-    max_memory       => '1024',
+    server_name      => $nepho_mediawiki::server_name,
+    admin_email      => $nepho_mediawiki::admin_email,
+    db_server        => $nepho_mediawiki::db_server,
+    db_root_user     => $nepho_mediawiki::db_root_user,
+    db_root_password => $nepho_mediawiki::db_root_password,
+    doc_root         => $nepho_mediawiki::doc_root,
+    max_memory       => $nepho_mediawiki::max_memory,
   }
 
   mediawiki::instance { 'huitarch':
     ensure      => 'present',
-    db_password => $::nepho_database_password,
-    db_name     => $::nepho_database_name,
-    db_user     => $::nepho_database_user,
-    port        => $::default_application_port,
+    db_password => $nepho_mediawiki::db_password,
+    db_name     => $nepho_mediawiki::db_name,
+    db_user     => $nepho_mediawiki::db_user,
+    port        => $nepho_mediawiki::app_port,
   }
 
   include s3file::curl
