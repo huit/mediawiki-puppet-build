@@ -25,9 +25,9 @@ backend default {
 
 acl purge {
   "localhost";
-#<% purge_ips.each do |ip| -%>
-#   "<%= @ip %>";
-#<% end -%>
+<% purge_ips.each do |ip| -%>
+   "<%= @ip %>";
+<% end -%>
 }
 
 sub vcl_recv {

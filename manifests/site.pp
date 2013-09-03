@@ -22,7 +22,7 @@ node default {
   $probe_interval     = "30s"
   $probe_timeout      = "10s"
   $probe_window       = "5"
-  $purge_ips          = [ '127.0.0.1' ]
+  $purge_ips          = [  ]
 
   case $nepho_instance_role {
     'varnish': {
