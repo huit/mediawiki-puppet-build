@@ -41,6 +41,9 @@ node default {
         db_password      => $nepho_database_password,
         db_port          => $nepho_database_port,
         app_port         => $default_application_port,
+        s3_bucket        => hiera('NEPHO_S3_BUCKET'),
+        s3_access_key    => hiera('NEPHO_S3_ACCESS_KEY'),
+        s3_secret_key    => hiera('NEPHO_S3_SECRET_KEY'),
       }
     }
     default: {
@@ -74,6 +77,9 @@ class nepho_mediawiki (
   $admin_email = 'admin@example.com',
   $doc_root = '/var/www/html',
   $max_memory = '1024',
+  $s3_bucket = false,
+  $s3_access_key = false,
+  $s3_secret_key = false,
   $ensure = 'present'
 ) {
   $mw_pkgs = [
@@ -124,26 +130,60 @@ class nepho_mediawiki (
   }
 
   # modify localsettings.php
+  file_line { 'additional_settings':
+    path => '/etc/mediawiki/huitarch/LocalSettings.php',
+    line => 'require("LocalSettings-nepho.php");',
+  }
 
-  # If the huitarch wiki is empty, run setup on one node
-  #if $::nepho_first_run == 'true' {
-    s3file { '/tmp/huitarch.xml':
-      source => 'huitarch-2013-09-03-release/huitarch.xml'
-    }
-    s3file { '/tmp/images.tar':
-      source => 'huitarch-2013-09-03-release/images.tar'
-    }
+  file { '/etc/mediawiki/huitarch/LocalSettings-nepho.php':
+    content => inline_template(file('templates/LocalSettings-nepho.php.erb')),
+    owner => root,
+    group => root,
+    mode => 0644,
+  }
 
-    # TODO: how to make sure this command only runs once?
-    exec { 'setup-huitarch':
+  s3file { '/tmp/huitarch.xml':
+    source => 'huitarch-2013-09-03-release/huitarch.xml'
+  }
+  s3file { '/tmp/images.tar':
+    source => 'huitarch-2013-09-03-release/images.tar'
+  }
+
+  exec { 'nepho-huitarch-import':
+    cwd     => '/etc/mediawiki/huitarch',
+    path    => ['/bin', '/usr/bin'],
+    command => 'tar xvf /tmp/images.tar -C /tmp; mkdir -p images/{archive,thumb,temp}; php maintenance/importDump.php --conf LocalSettings.php /tmp/huitarch.xml',
+    creates => '/tmp/images',
+    require => [
+      S3file['/tmp/huitarch.xml'],
+      S3file['/tmp/images.tar'],
+      Mediawiki::Instance['huitarch'],
+    ],
+    notify => Exec['nepho-huitarch-rebuild'],
+  }
+
+  exec { 'nepho-huitarch-rebuild':
+    cwd     => '/etc/mediawiki/huitarch',
+    path    => ['/bin', '/usr/bin'],
+    command => 'php maintenance/rebuildRecentChanges.php --conf LocalSettings.php; php maintenance/update.php --conf LocalSettings.php; php maintenance/importImages.php --conf LocalSettings.php /tmp/images pdf jpg',
+    notify => Exec['nepho-huitarch-import-images'],
+    refreshonly => true,
+  }
+
+  exec { 'nepho-huitarch-import-images':
+    cwd     => '/etc/mediawiki/huitarch',
+    path    => ['/bin', '/usr/bin'],
+    command => 'php maintenance/importImages.php --conf LocalSettings.php /tmp/images pdf jpg',
+    notify => Exec['nepho-huitarch-import-images'],
+    refreshonly => true,
+  }
+
+  if $s3_bucket != false {
+    # Copy images to s3
+    exec { 'nepho-huitarch-populate-s3':
       cwd     => '/etc/mediawiki/huitarch',
       path    => ['/bin', '/usr/bin'],
-      command => 'tar xvf /tmp/images.tar -C /tmp; mkdir -p images/{archive,thumb,temp}; php maintenance/importDump.php --conf LocalSettings.php /tmp/huitarch.xml; php maintenance/rebuildRecentChanges.php --conf LocalSettings.php; php maintenance/update.php --conf LocalSettings.php; php maintenance/importImages.php --conf LocalSettings.php /tmp/images pdf jpg',
-      require => [
-        S3file['/tmp/huitarch.xml'],
-        S3file['/tmp/images.tar'],
-        Mediawiki::Instance['huitarch'],
-      ],
+      command => 's3put -a $s3_access_key -s $s3_secret_key -b $s3_bucket -d 1 -g public-read images',
     }
-  #}
+  }
 }
