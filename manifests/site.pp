@@ -19,13 +19,17 @@ node default {
   $nepho_database_user     = hiera('NEPHO_DATABASE_USER',$default_database_user)
   $nepho_database_password = hiera('NEPHO_DATABASE_PASSWORD',$default_database_password)
 
+  $probe_interval     = "30s"
+  $probe_timeout      = "10s"
+  $probe_window       = "5"
+  $purge_ips          = [ '127.0.0.1' ]
 
   case $nepho_instance_role {
     'varnish': {
       # tier 1
       # use a custom VCL
       class { 'varnish':
-        vcl_content => inline_template(file('templates/tiered.vcl.erb'))
+        vcl_content => inline_template(file('/tmp/mediawiki-puppet-build/templates/tiered.vcl.erb'))
       }
     }
     'mediawiki': {
