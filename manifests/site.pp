@@ -140,7 +140,7 @@ class nepho_mediawiki (
   }
 
   file { '/etc/mediawiki/huitarch/LocalSettings-nepho.php':
-    content => inline_template(file('templates/LocalSettings-nepho.php.erb')),
+    content => inline_template(file('/tmp/mediawiki-puppet-build/templates/LocalSettings-nepho.php.erb')),
     owner => root,
     group => root,
     mode => 0644,
