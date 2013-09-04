@@ -18,6 +18,9 @@ node default {
   $nepho_database_name     = hiera('NEPHO_DATABASE_NAME',$default_database_name)
   $nepho_database_user     = hiera('NEPHO_DATABASE_USER',$default_database_user)
   $nepho_database_password = hiera('NEPHO_DATABASE_PASSWORD',$default_database_password)
+  $nepho_s3_bucket         = hiera('NEPHO_S3_BUCKET',false)
+  $nepho_s3_access_key     = hiera('NEPHO_S3_BUCKET_ACCESS','no_s3_bucket_access_provided')
+  $nepho_s3_secret_key     = hiera('NEPHO_S3_BUCKET_KEY','no_s3_bucket_secret_provided')
 
   $probe_interval     = "30s"
   $probe_timeout      = "10s"
@@ -45,9 +48,9 @@ node default {
         db_password      => $nepho_database_password,
         db_port          => $nepho_database_port,
         app_port         => $default_application_port,
-        s3_bucket        => hiera('NEPHO_S3_BUCKET'),
-        s3_access_key    => hiera('NEPHO_S3_BUCKET_ACCESS'),
-        s3_secret_key    => hiera('NEPHO_S3_BUCKET_KEY'),
+        s3_bucket        => $nepho_s3_bucket,
+        s3_access_key    => $nepho_s3_access_key,
+        s3_secret_key    => $nepho_s3_secret_key,
       }
     }
     default: {
@@ -184,12 +187,12 @@ class nepho_mediawiki (
     refreshonly => true,
   }
 
-  if $s3_bucket != false {
+  if $nepho_mediawiki::s3_bucket != false {
     # Copy images to s3
     exec { 'nepho-huitarch-populate-s3':
       cwd     => '/etc/mediawiki/huitarch',
       path    => ['/bin', '/usr/bin'],
-      command => 's3put -a $s3_access_key -s $s3_secret_key -b $s3_bucket -d 1 -g public-read images',
+      command => "s3put -a '$nepho_mediawiki::s3_access_key' -s '$nepho_mediawiki::s3_secret_key' -b $s3_bucket -d 1 -g public-read images",
     }
   }
 }
