@@ -135,8 +135,9 @@ class nepho_mediawiki (
 
   # modify localsettings.php
   file_line { 'additional_settings':
-    path => '/etc/mediawiki/huitarch/LocalSettings.php',
-    line => 'require("LocalSettings-nepho.php");',
+    path    => '/etc/mediawiki/huitarch/LocalSettings.php',
+    line    => 'require("LocalSettings-nepho.php");',
+    require => Mediawiki::Instance['huitarch'],
   }
 
   file { '/etc/mediawiki/huitarch/LocalSettings-nepho.php':
