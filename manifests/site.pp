@@ -110,6 +110,7 @@ class nepho_mediawiki (
 
   mediawiki::instance { 'huitarch':
     ensure      => 'present',
+    db_server   => $nepho_mediawiki::db_server,
     db_password => $nepho_mediawiki::db_password,
     db_name     => $nepho_mediawiki::db_name,
     db_user     => $nepho_mediawiki::db_user,
