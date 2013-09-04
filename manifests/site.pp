@@ -46,8 +46,8 @@ node default {
         db_port          => $nepho_database_port,
         app_port         => $default_application_port,
         s3_bucket        => hiera('NEPHO_S3_BUCKET'),
-        s3_access_key    => hiera('NEPHO_S3_ACCESS_KEY'),
-        s3_secret_key    => hiera('NEPHO_S3_SECRET_KEY'),
+        s3_access_key    => hiera('NEPHO_S3_BUCKET_ACCESS'),
+        s3_secret_key    => hiera('NEPHO_S3_BUCKET_KEY'),
       }
     }
     default: {
@@ -136,8 +136,9 @@ class nepho_mediawiki (
 
   # modify localsettings.php
   file_line { 'additional_settings':
-    path => '/etc/mediawiki/huitarch/LocalSettings.php',
-    line => 'require("LocalSettings-nepho.php");',
+    path    => '/etc/mediawiki/huitarch/LocalSettings.php',
+    line    => 'require("LocalSettings-nepho.php");',
+    require => Mediawiki::Instance['huitarch'],
   }
 
   file { '/etc/mediawiki/huitarch/LocalSettings-nepho.php':
