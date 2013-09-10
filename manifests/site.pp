@@ -192,16 +192,15 @@ class nepho_mediawiki (
     cwd     => '/etc/mediawiki/huitarch',
     path    => ['/bin', '/usr/bin'],
     command => 'php maintenance/importImages.php --conf LocalSettings.php /tmp/images pdf jpg',
-    notify => Exec['nepho-huitarch-import-images'],
     refreshonly => true,
   }
 
-  if $nepho_mediawiki::s3_bucket != false {
-    # Copy images to s3
-    exec { 'nepho-huitarch-populate-s3':
-      cwd     => '/etc/mediawiki/huitarch',
-      path    => ['/bin', '/usr/bin'],
-      command => "aws s3 cp --recursive images s3://$nepho_mediawiki::s3_bucket/",
-    }
+  # Copy images to s3
+  exec { 'nepho-huitarch-populate-s3':
+    cwd         => '/etc/mediawiki/huitarch',
+    path        => ['/bin', '/usr/bin'],
+    command     => "aws s3 cp --recursive images s3://$nepho_mediawiki::s3_bucket/",
+    subscribe   => Exec['nepho-huitarch-import-images'],
+    refreshonly => true,
   }
 }
