@@ -1,4 +1,6 @@
 <?php
+// sessions in DB rather than on local disk
+$wgSessionHandler        = "session_mysql";
 $wgEnableUploads         = true;
 $wgHashedUploadDirectory = false;
 require_once "$IP/extensions/gists.php";
