@@ -100,6 +100,13 @@ class nepho_mediawiki (
     before => Class['mediawiki'],
   }
 
+  package { 'python-pip': }
+  package { 'awscli':
+    ensure   => latest,
+    provider => 'pip',
+    require  => Package['python-pip'],
+  }
+
   # needs to be modified to talk to RDS
   class { 'mediawiki':
     server_name      => $nepho_mediawiki::server_name,
@@ -194,7 +201,7 @@ class nepho_mediawiki (
     exec { 'nepho-huitarch-populate-s3':
       cwd     => '/etc/mediawiki/huitarch',
       path    => ['/bin', '/usr/bin'],
-      command => "s3put -a '$nepho_mediawiki::s3_access_key' -s '$nepho_mediawiki::s3_secret_key' -b $s3_bucket -d 1 -g public-read images",
+      command => "aws s3 cp --recursive images s3://$nepho_mediawiki::s3_bucket/",
     }
   }
 }
