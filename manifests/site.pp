@@ -166,6 +166,8 @@ class nepho_mediawiki (
     require => [
       S3file['/tmp/huitarch.xml'],
       S3file['/tmp/images.tar'],
+      S3file['/etc/mediawiki/huitarch/extensions/gists.php'],
+      Exec['unzip-locals3repo'],
       Mediawiki::Instance['huitarch'],
     ],
     notify => Exec['nepho-huitarch-rebuild'],
