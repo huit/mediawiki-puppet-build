@@ -27,6 +27,17 @@ node default {
   $probe_window       = "5"
   $purge_ips          = [  ]
 
+  exec { 'preinstall-postfix':
+    command   => '/usr/bin/yum -y install postfix',
+    creates   => '/etc/postfix',
+    before    => Class['postfix'],
+    logoutput => 'on_failure',
+  }
+
+  class { 'postfix':
+    smtp_relay => true,
+  }
+
   if $nepho_instance_role {
     package { 'update-motd':
       ensure => 'present',
