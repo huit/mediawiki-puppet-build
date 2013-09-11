@@ -229,7 +229,7 @@ class nepho_mediawiki (
     }
   }
 
-  file { '/var/www/html/huitarch/index.html':
+  file { '/var/www/html/index.html':
     ensure  => 'present',
     require => Mediawiki::Instance['huitarch'],
     owner   => 'root',
