@@ -48,7 +48,7 @@ node default {
         db_password      => $nepho_database_password,
         db_port          => $nepho_database_port,
         app_port         => $default_application_port,
-        s3_bucket        => $nepho_s3_bucket,
+        s3_bucket        => false, # disable for PoC
         s3_access_key    => $nepho_s3_access_key,
         s3_secret_key    => $nepho_s3_secret_key,
       }
@@ -90,7 +90,6 @@ class nepho_mediawiki (
   $ensure = 'present'
 ) {
   $mw_pkgs = [
-    'php-pecl-apc', # Use APC for PHP opcode caching
     'php-xml',      # PHP XML support for content import
     'php-intl',     # PHP Unicode normalization
   ]
@@ -168,8 +167,8 @@ class nepho_mediawiki (
   exec { 'nepho-huitarch-import':
     cwd     => '/etc/mediawiki/huitarch',
     path    => ['/bin', '/usr/bin'],
-    command => 'tar xvf /tmp/images.tar -C /tmp; mkdir -p images/{archive,thumb,temp}; php maintenance/importDump.php --conf LocalSettings.php /tmp/huitarch.xml',
-    creates => '/tmp/images',
+    command => 'tar xvf /tmp/images.tar -C images; php maintenance/importDump.php --conf LocalSettings.php /tmp/huitarch.xml',
+    creates => '/etc/mediawiki/huitarch/images/archive',
     require => [
       S3file['/tmp/huitarch.xml'],
       S3file['/tmp/images.tar'],
@@ -177,7 +176,7 @@ class nepho_mediawiki (
       Exec['unzip-locals3repo'],
       Mediawiki::Instance['huitarch'],
     ],
-    notify => Exec['nepho-huitarch-rebuild'],
+    notify  => Exec['nepho-huitarch-rebuild'],
   }
 
   exec { 'nepho-huitarch-rebuild':
@@ -195,12 +194,14 @@ class nepho_mediawiki (
     refreshonly => true,
   }
 
-  # Copy images to s3
-  exec { 'nepho-huitarch-populate-s3':
-    cwd         => '/etc/mediawiki/huitarch',
-    path        => ['/bin', '/usr/bin'],
-    command     => "aws s3 cp --recursive images s3://$nepho_mediawiki::s3_bucket/",
-    subscribe   => Exec['nepho-huitarch-import-images'],
-    refreshonly => true,
+  if $s3_bucket != false {
+    # Copy images to s3
+    exec { 'nepho-huitarch-populate-s3':
+      cwd         => '/etc/mediawiki/huitarch',
+      path        => ['/bin', '/usr/bin'],
+      command     => "aws s3 cp --recursive images s3://${nepho_mediawiki::s3_bucket}/",
+      subscribe   => Exec['nepho-huitarch-import-images'],
+      refreshonly => true,
+    }
   }
 }

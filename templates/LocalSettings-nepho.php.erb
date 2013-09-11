@@ -1,11 +1,18 @@
 <?php
-$wgEnableUploads         = true;
 $wgHashedUploadDirectory = false;
+
+// disable image uploads for PoC, as LocalS3File extension has problems
+$wgEnableUploads = false;
+
+// include gists extension
 require_once "$IP/extensions/gists.php";
 
 // use db objectcache for sessions
 $wgMainCacheType = CACHE_DB;
 $wgSessionsInMemcached = true;
+
+// enable debug toolbar
+$wgDebugToolbar = true;
 
 <% if @s3_bucket != false %>
 // s3 filesystem repo
