@@ -43,9 +43,9 @@ node default {
     }
 
     exec { 'run-update-motd':
-      command      => '/usr/bin/update-motd',
-      logoutput    => 'on_failure',
-      refresh_only => true,
+      command     => '/usr/bin/update-motd',
+      logoutput   => 'on_failure',
+      refreshonly => true,
     }
   }
 
