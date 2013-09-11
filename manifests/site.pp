@@ -27,6 +27,15 @@ node default {
   $probe_window       = "5"
   $purge_ips          = [  ]
 
+  if $nepho_instance_role {
+    exec { 'role-in-motd':
+      path      => '/bin:/sbin:/usr/bin:/usr/sbin',
+      command   => "echo 'Role: ${nepho_instance_role}' >> /etc/motd",
+      unless    => "grep -q ${nepho_instance_role} /etc/motd",
+      logoutput => 'on_failure',
+    }
+  }
+
   case $nepho_instance_role {
     'varnish': {
       # tier 1
