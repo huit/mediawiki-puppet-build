@@ -27,6 +27,30 @@ node default {
   $probe_window       = "5"
   $purge_ips          = [  ]
 
+  if $nepho_instance_role {
+    package { 'update-motd':
+      ensure => 'present',
+    }
+
+    file { '/etc/update-motd.d/90-motd-role':
+      ensure  => 'present',
+      owner   => 'root',
+      group   => 'root',
+      mode    => 0755,
+      content => inline_template(file('/tmp/mediawiki-puppet-build/templates/motd-role.erb')),
+      require   => Package['update-motd'],
+      before    => Exec['run-update-motd'],
+      notify    => Exec['run-update-motd'],
+    }
+
+    exec { 'run-update-motd':
+      path        => '/bin:/sbin:/usr/bin:/usr/sbin',
+      command     => 'update-motd',
+      logoutput   => 'on_failure',
+      refreshonly => true,
+    }
+  }
+
   case $nepho_instance_role {
     'varnish': {
       # tier 1
