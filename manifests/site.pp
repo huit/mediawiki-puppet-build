@@ -43,7 +43,8 @@ node default {
     }
 
     exec { 'run-update-motd':
-      command     => '/usr/bin/update-motd',
+      path        => '/bin:/sbin:/usr/bin:/usr/sbin',
+      command     => 'update-motd',
       logoutput   => 'on_failure',
       refreshonly => true,
     }
