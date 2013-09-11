@@ -10,7 +10,7 @@ prefix || prefix = default_prefix
 
 # extract env vars matching prefix and put them in a hash
 extracted = {}
-ENV.select {|key, value| key =~ /^#{prefix}/}.each {|pair| extracted[pair[0]] = pair[1]}
+ENV.select {|key, value| key =~ /^#{prefix}/}.each {|pair| extracted[pair[0]] = pair[1] unless pair[1].to_s.empty?}
 
 # emit the hash
 puts extracted.to_yaml
