@@ -21,11 +21,28 @@ node default {
   $nepho_s3_bucket         = hiera('NEPHO_S3_BUCKET',false)
   $nepho_s3_access_key     = hiera('NEPHO_S3_BUCKET_ACCESS','no_s3_bucket_access_provided')
   $nepho_s3_secret_key     = hiera('NEPHO_S3_BUCKET_KEY','no_s3_bucket_secret_provided')
+  $nepho_mail_relay_host   = hiera('NEPHO_MAIL_RELAY_HOST','')
 
   $probe_interval     = "30s"
   $probe_timeout      = "10s"
   $probe_window       = "5"
   $purge_ips          = [  ]
+
+  exec { 'preinstall-postfix':
+    command   => '/usr/bin/yum -y install postfix',
+    creates   => '/etc/postfix',
+    before    => Class['postfix'],
+    logoutput => 'on_failure',
+  }
+
+  if $nepho_mail_relay_host {
+    class { 'postfix':
+      relay_host => $nepho_mail_relay_host,
+    }
+  }
+  else {
+    class { 'postfix': }
+  }
 
   if $nepho_instance_role {
     package { 'update-motd':
