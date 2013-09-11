@@ -7,6 +7,7 @@ mod "puppetlabs/mysql"
 mod "saz/memcached"
 mod "hunner/hiera"
 mod "branan/s3file"
+mod "evenup/postfix"
 mod "evenup/varnish"
 
 mod "apache",
