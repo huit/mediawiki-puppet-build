@@ -3,6 +3,10 @@ $wgEnableUploads         = true;
 $wgHashedUploadDirectory = false;
 require_once "$IP/extensions/gists.php";
 
+// use db objectcache for sessions
+$wgMainCacheType = CACHE_DB;
+$wgSessionsInMemcached = true;
+
 <% if @s3_bucket != false %>
 // s3 filesystem repo
 $wgUploadDirectory = 'images';
