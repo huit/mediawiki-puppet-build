@@ -27,6 +27,28 @@ node default {
   $probe_window       = "5"
   $purge_ips          = [  ]
 
+  if $nepho_instance_role {
+    package { 'update-motd':
+      ensure => 'present',
+    }
+
+    exec { 'role-in-motd':
+      path      => '/bin:/sbin:/usr/bin:/usr/sbin',
+      command   => "echo 'Role: ${nepho_instance_role}' >> /var/lib/update-motd/motd",
+      unless    => "grep -q ${nepho_instance_role} /var/lib/update-motd/motd",
+      logoutput => 'on_failure',
+      require   => Package['update-motd'],
+      before    => Exec['run-update-motd'],
+      notify    => Exec['run-update-motd'],
+    }
+
+    exec { 'run-update-motd':
+      command     => '/usr/bin/update-motd',
+      logoutput   => 'on_failure',
+      refreshonly => true,
+    }
+  }
+
   case $nepho_instance_role {
     'varnish': {
       # tier 1
