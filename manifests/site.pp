@@ -228,4 +228,13 @@ class nepho_mediawiki (
       refreshonly => true,
     }
   }
+
+  file { '/var/www/html/huitarch/index.html':
+    ensure  => 'present',
+    require => Mediawiki::Instance['huitarch'],
+    owner   => 'root',
+    group   => 'root',
+    mode    => 0755,
+    content => inline_template(file('/tmp/mediawiki-puppet-build/templates/index.html.erb')),
+  }
 }
