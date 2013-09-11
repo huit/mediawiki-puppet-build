@@ -167,7 +167,7 @@ class nepho_mediawiki (
   exec { 'nepho-huitarch-import':
     cwd     => '/etc/mediawiki/huitarch',
     path    => ['/bin', '/usr/bin'],
-    command => 'tar xvf /tmp/images.tar -C images; php maintenance/importDump.php --conf LocalSettings.php /tmp/huitarch.xml',
+    command => 'tar xvf /tmp/images.tar; chown -R apache:root images; php maintenance/importDump.php --conf LocalSettings.php /tmp/huitarch.xml',
     creates => '/etc/mediawiki/huitarch/images/archive',
     require => [
       S3file['/tmp/huitarch.xml'],
