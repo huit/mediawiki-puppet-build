@@ -223,7 +223,7 @@ class nepho_mediawiki (
   exec { 'nepho-huitarch-rebuild':
     cwd     => '/etc/mediawiki/huitarch',
     path    => ['/bin', '/usr/bin'],
-    command => 'php maintenance/rebuildRecentChanges.php --conf LocalSettings.php; php maintenance/update.php --conf LocalSettings.php; php maintenance/importImages.php --conf LocalSettings.php /tmp/images pdf jpg',
+    command => 'php maintenance/rebuildRecentChanges.php --conf LocalSettings.php; php maintenance/update.php --conf LocalSettings.php',
     notify => Exec['nepho-huitarch-import-images'],
     refreshonly => true,
   }
@@ -231,7 +231,7 @@ class nepho_mediawiki (
   exec { 'nepho-huitarch-import-images':
     cwd     => '/etc/mediawiki/huitarch',
     path    => ['/bin', '/usr/bin'],
-    command => 'php maintenance/importImages.php --conf LocalSettings.php /tmp/images pdf jpg',
+    command => 'php maintenance/importImages.php --conf LocalSettings.php images pdf jpg',
     refreshonly => true,
   }
 
