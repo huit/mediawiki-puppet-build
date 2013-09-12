@@ -8,6 +8,8 @@ node default {
   $default_database_user     = 'mediawiki'
   $default_database_password = 'mediawiki'
   $default_application_port  = '8080'
+  $default_smtp_endpoint     = 'localhost'
+  $default_smtp_port         = '25'
 
   # parameters passed from nepho
   $nepho_instance_role     = hiera('NEPHO_INSTANCE_ROLE')
@@ -21,27 +23,33 @@ node default {
   $nepho_s3_bucket         = hiera('NEPHO_S3_BUCKET',false)
   $nepho_s3_access_key     = hiera('NEPHO_S3_BUCKET_ACCESS','no_s3_bucket_access_provided')
   $nepho_s3_secret_key     = hiera('NEPHO_S3_BUCKET_KEY','no_s3_bucket_secret_provided')
-  $nepho_mail_relay_host   = hiera('NEPHO_MAIL_RELAY_HOST','')
+  $nepho_ses_smtp          = str2bool(hiera('NEPHO_SES_SMTP','false'))
+  $nepho_ses_smtp_endpoint = hiera('NEPHO_SES_SMTP_ENDPONT',$default_smtp_endpoint)
+  $nepho_ses_smtp_port     = hiera('NEPHO_SES_SMTP_PORT',$default_smtp_port)
+  $nepho_ses_smtp_username = hiera('NEPHO_SES_SMTP_USERNAME',false)
+  $nepho_ses_smtp_password = hiera('NEPHO_SES_SMTP_PASSWORD',false)
 
   $probe_interval     = "30s"
   $probe_timeout      = "10s"
   $probe_window       = "5"
   $purge_ips          = [  ]
 
-  exec { 'preinstall-postfix':
-    command   => '/usr/bin/yum -y install postfix',
-    creates   => '/etc/postfix',
-    before    => Class['postfix'],
-    logoutput => 'on_failure',
-  }
-
-  if $nepho_mail_relay_host {
-    class { 'postfix':
-      relay_host => $nepho_mail_relay_host,
+  if $nepho_ses_smtp {
+    exec { 'preinstall-postfix':
+      command   => '/usr/bin/yum -y install postfix',
+      creates   => '/etc/postfix',
+      before    => Class['postfix'],
+      logoutput => 'on_failure',
     }
-  }
-  else {
-    class { 'postfix': }
+
+    if $nepho_mail_relay_host {
+      class { 'postfix':
+        relay_host => $nepho_mail_relay_host,
+      }
+    }
+    else {
+      class { 'postfix': }
+    }
   }
 
   if $nepho_instance_role {
