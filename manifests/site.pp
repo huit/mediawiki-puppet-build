@@ -96,6 +96,7 @@ node default {
         db_password      => $nepho_database_password,
         db_port          => $nepho_database_port,
         app_port         => $default_application_port,
+        admin_email      => "huitarch@${nepho_ses_smtp_domain}",
         s3_bucket        => false, # disable for PoC
         s3_access_key    => $nepho_s3_access_key,
         s3_secret_key    => $nepho_s3_secret_key,
@@ -114,6 +115,7 @@ node default {
         db_password      => $nepho_database_password,
         db_port          => $nepho_database_port,
         app_port         => $default_application_port,
+        admin_email      => "huitarch@${nepho_ses_smtp_domain}",
       }
     }
   }

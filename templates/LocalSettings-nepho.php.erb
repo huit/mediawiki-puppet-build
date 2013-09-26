@@ -17,6 +17,10 @@ $wgSessionsInMemcached = true;
 // enable debug toolbar
 $wgDebugToolbar = true;
 
+// configure password email
+$wgEmergencyContact = "<%= @admin_email -%>";
+$wgPasswordSender = "<%= @admin_email -%>";
+
 <% if @s3_bucket != false %>
 // s3 filesystem repo
 $wgUploadDirectory = 'images';
